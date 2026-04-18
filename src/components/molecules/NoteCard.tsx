@@ -8,8 +8,28 @@ interface NoteCardProps {
   onClick: () => void;
 }
 
+/**
+ * Strips common markdown syntax for a cleaner plain-text preview
+ */
+function stripMarkdown(text: string, maxLen = 120): string {
+  if (!text) return '';
+  return text
+    .replace(/```[\s\S]*?```/g, '[code]') // Replace code blocks
+    .replace(/#{1,6}\s+/g, '') // Remove headings
+    .replace(/(\*\*|__)(.*?)\1/g, '$2') // Remove bold
+    .replace(/(\*|_)(.*?)\1/g, '$2') // Remove italic
+    .replace(/`([^`]+)`/g, '$1') // Remove inline code
+    .replace(/\[([^\]]+)\]\([^)]+\)/g, '$1') // Remove links
+    .replace(/^[-*+]\s+/gm, '') // Remove bullet points
+    .replace(/^\d+\.\s+/gm, '') // Remove numbered lists
+    .replace(/^>\s+/gm, '') // Remove blockquotes
+    .replace(/\n+/g, ' ') // Replace newlines with spaces
+    .trim()
+    .slice(0, maxLen);
+}
+
 export function NoteCard({ note, selected, onClick }: NoteCardProps) {
-  const preview = note.content.replace(/\n+/g, ' ').slice(0, 90);
+  const preview = stripMarkdown(note.content, 110);
 
   return (
     <button
@@ -30,7 +50,7 @@ export function NoteCard({ note, selected, onClick }: NoteCardProps) {
             selected ? 'text-[--color-ink]' : 'text-[--color-ink-soft]'
           )}
         >
-          {note.title}
+          {note.title || 'Untitled'}
         </h3>
         <span className="text-xs text-[--color-ink-mute] shrink-0 mt-0.5 font-mono">
           {formatRelative(note.updated_at)}

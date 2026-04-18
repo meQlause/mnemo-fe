@@ -5,12 +5,13 @@ import { useNoteAI } from '@/hooks/useNoteAI';
 import { Trash2, Pencil, Check, X } from 'lucide-react';
 import { Button } from '@/components/atoms/Button';
 import { Input } from '@/components/atoms/Input';
-import { Textarea } from '@/components/atoms/Textarea';
 import { ConfirmDialog } from '@/components/molecules/ConfirmDialog';
 import { useNotesStore } from '@/stores/notesStore';
 import { useState } from 'react';
 import { toast } from 'sonner';
 import type { Note } from '@/utils/types';
+import { Markdown } from '@/components/atoms/Markdown';
+import { RichTextEditor } from '@/components/molecules/RichTextEditor';
 
 interface NoteDetailProps {
   note: Note;
@@ -134,12 +135,10 @@ export function NoteDetail({ note }: NoteDetailProps) {
                 onChange={(e) => setEditedTitle(e.target.value)}
                 placeholder="Note title..."
               />
-              <Textarea
-                label="Content"
-                value={editedContent}
-                onChange={(e) => setEditedContent(e.target.value)}
-                placeholder="Write something..."
-                rows={15}
+              <RichTextEditor
+                content={editedContent}
+                onChange={setEditedContent}
+                minHeight="400px"
               />
             </div>
           ) : (
@@ -170,9 +169,7 @@ export function NoteDetail({ note }: NoteDetailProps) {
                 )}
               </div>
               <div className="prose prose-sm max-w-none">
-                <p className="text-[--color-ink-soft] leading-relaxed whitespace-pre-wrap font-sans text-sm">
-                  {note.content}
-                </p>
+                <Markdown content={note.content} />
               </div>
             </div>
           )}

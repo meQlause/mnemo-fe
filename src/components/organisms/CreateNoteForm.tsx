@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { toast } from 'sonner';
 import { Button } from '@/components/atoms/Button';
 import { Input } from '@/components/atoms/Input';
-import { Textarea } from '@/components/atoms/Textarea';
+import { RichTextEditor } from '@/components/molecules/RichTextEditor';
 import { useNotesStore } from '@/stores/notesStore';
 import { suggestTitle } from '@/services/aiService';
 import { X, Loader2, Sparkles } from 'lucide-react';
@@ -116,14 +116,17 @@ export function CreateNoteForm({ onSuccess, onCancel }: CreateNoteFormProps) {
             />
           </div>
 
-          <Textarea
-            label="Content"
-            placeholder="Start writing…"
-            value={content}
-            onChange={(e) => setContent(e.target.value)}
-            rows={12}
-            required
-          />
+          <div className="flex flex-col gap-1.5">
+            <label className="text-xs font-medium text-[--color-ink-soft] uppercase tracking-wider">
+              Content
+            </label>
+            <RichTextEditor
+              content={content}
+              onChange={setContent}
+              placeholder="Start writing…"
+              minHeight="350px"
+            />
+          </div>
           
           <div className="flex items-center justify-between pt-2">
             <div className="flex items-center gap-3">

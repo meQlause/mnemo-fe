@@ -3,6 +3,7 @@ import { formatTime } from '@/utils/date';
 import { useNotesStore } from '@/stores/notesStore';
 import { BookOpen } from 'lucide-react';
 import type { ChatMessage } from '@/utils/types';
+import { Markdown } from '@/components/atoms/Markdown';
 
 interface ChatBubbleProps {
   message: ChatMessage;
@@ -10,57 +11,12 @@ interface ChatBubbleProps {
 
 export function ChatBubble({ message }: ChatBubbleProps) {
   const isUser = message.role === 'user';
-  const selectNote = useNotesStore((s) => s.selectNote);  
+  const selectNote = useNotesStore((s) => s.selectNote);
   const notes = useNotesStore((s) => s.notes);
 
   const handleNoteClick = (id: number) => {
     const note = notes.find((n) => n.id === id);
     if (note) selectNote(note);
-  };
-
-  const renderFormattedContent = (content: string) => {
-    if (!content) return null;
-
-    const lines = content.split('\n');
-    const elements: React.ReactNode[] = [];
-    let currentList: string[] = [];
-
-    const flushList = () => {
-      if (currentList.length > 0) {
-        elements.push(
-          <ul key={`list-${elements.length}`} className="my-3 flex flex-col gap-2">
-            {currentList.map((item, idx) => (
-              <li key={idx} className="flex gap-2 group">
-                <span className="text-[--color-accent] mt-1 shrink-0 font-bold">*</span>
-                <span className="text-[--color-ink-soft]">{item}</span>
-              </li>
-            ))}
-          </ul>
-        );
-        currentList = [];
-      }
-    };
-
-    lines.forEach((line, index) => {
-      const trimmedLine = line.trim();
-      if (trimmedLine.startsWith('*')) {
-        // Remove asterisk and space
-        currentList.push(trimmedLine.substring(1).trim());
-      } else if (trimmedLine === '') {
-        flushList();
-        elements.push(<div key={`spacer-${index}`} className="h-2" />);
-      } else {
-        flushList();
-        elements.push(
-          <p key={`p-${index}`} className="mb-2 last:mb-0">
-            {line}
-          </p>
-        );
-      }
-    });
-
-    flushList();
-    return elements;
   };
 
   return (
@@ -85,23 +41,29 @@ export function ChatBubble({ message }: ChatBubbleProps) {
               : 'bg-[--color-surface] border border-[--color-border] text-[--color-ink] rounded-tl-[--radius-sm] shadow-[--shadow-sm]'
           )}
         >
-          <div className="whitespace-pre-wrap">
-            {renderFormattedContent(message.content) || (!message.status && (
-              <span className="flex gap-1 items-center py-0.5">
-                <span
-                  className="w-1.5 h-1.5 rounded-full bg-[--color-ink-mute] animate-pulse-soft"
-                  style={{ animationDelay: '0ms' }}
-                />
-                <span
-                  className="w-1.5 h-1.5 rounded-full bg-[--color-ink-mute] animate-pulse-soft"
-                  style={{ animationDelay: '200ms' }}
-                />
-                <span
-                  className="w-1.5 h-1.5 rounded-full bg-[--color-ink-mute] animate-pulse-soft"
-                  style={{ animationDelay: '400ms' }}
-                />
-              </span>
-            ))}
+          <div className={cn(!isUser && 'whitespace-normal')}>
+            {isUser ? (
+              <div className="whitespace-pre-wrap">{message.content}</div>
+            ) : message.content ? (
+              <Markdown content={message.content} compact />
+            ) : (
+              !message.status && (
+                <span className="flex gap-1 items-center py-0.5">
+                  <span
+                    className="w-1.5 h-1.5 rounded-full bg-[--color-ink-mute] animate-pulse-soft"
+                    style={{ animationDelay: '0ms' }}
+                  />
+                  <span
+                    className="w-1.5 h-1.5 rounded-full bg-[--color-ink-mute] animate-pulse-soft"
+                    style={{ animationDelay: '200ms' }}
+                  />
+                  <span
+                    className="w-1.5 h-1.5 rounded-full bg-[--color-ink-mute] animate-pulse-soft"
+                    style={{ animationDelay: '400ms' }}
+                  />
+                </span>
+              )
+            )}
           </div>
 
           {!isUser && message.context && message.context.length > 0 && (
@@ -132,8 +94,8 @@ export function ChatBubble({ message }: ChatBubbleProps) {
           {message.status && message.streaming && (
             <div className="flex items-center gap-2 mt-3 py-1 px-2 bg-[--color-paper-warm] rounded-[--radius-md] border border-[--color-border-soft] animate-in fade-in slide-in-from-bottom-1">
               <span className="relative flex h-2 w-2">
-                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-[--color-accent] opacity-75"></span>
-                <span className="relative inline-flex rounded-full h-2 w-2 bg-[--color-accent]"></span>
+                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-[--color-accent] opacity-75" />
+                <span className="relative inline-flex rounded-full h-2 w-2 bg-[--color-accent]" />
               </span>
               <span className="text-[10px] uppercase tracking-widest font-bold text-[--color-ink-soft]">
                 {message.status}…
