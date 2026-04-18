@@ -114,7 +114,12 @@ function MenuBar({ editor }: { editor: Editor | null }) {
   );
 }
 
-export function RichTextEditor({ content, onChange, placeholder, minHeight = '300px' }: RichTextEditorProps) {
+export function RichTextEditor({
+  content,
+  onChange,
+  placeholder,
+  minHeight = '300px',
+}: RichTextEditorProps) {
   const editor = useEditor({
     extensions: [
       StarterKit.configure({
@@ -172,7 +177,7 @@ export function RichTextEditor({ content, onChange, placeholder, minHeight = '30
       const storage = editor.storage as unknown as Record<string, MarkdownStorage>;
       const currentMarkdown = storage.markdown.getMarkdown();
       if (content !== currentMarkdown) {
-        editor.commands.setContent(content);
+        editor.commands.setContent(content, { emitUpdate: false, parseOptions: { preserveWhitespace: 'full' } });
       }
     }
   }, [content, editor]);
