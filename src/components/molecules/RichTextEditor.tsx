@@ -1,3 +1,4 @@
+import { useEffect } from 'react';
 import { Editor, useEditor, EditorContent } from '@tiptap/react';
 import StarterKit from '@tiptap/starter-kit';
 import Link from '@tiptap/extension-link';
@@ -165,6 +166,16 @@ export function RichTextEditor({ content, onChange, placeholder, minHeight = '30
     },
     immediatelyRender: false,
   });
+
+  useEffect(() => {
+    if (editor) {
+      const storage = editor.storage as unknown as Record<string, MarkdownStorage>;
+      const currentMarkdown = storage.markdown.getMarkdown();
+      if (content !== currentMarkdown) {
+        editor.commands.setContent(content, false, { preserveWhitespace: 'full' });
+      }
+    }
+  }, [content, editor]);
 
   return (
     <div className="border border-[--color-border] rounded-[--radius-md] overflow-hidden bg-[--color-surface] focus-within:border-[--color-ink] transition-all group/editor relative">
