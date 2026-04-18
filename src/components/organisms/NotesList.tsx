@@ -64,7 +64,7 @@ export function NotesList({ onCreateNew, onNoteSelect }: NotesListProps) {
       </div>
 
       {/* List */}
-      <div className="flex-1 overflow-y-auto px-2 py-2">
+      <div className="flex-1 overflow-y-auto overscroll-contain px-2 py-2">
         {isLoading && (
           <div className="flex justify-center py-8">
             <Spinner size="sm" />

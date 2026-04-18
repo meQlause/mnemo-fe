@@ -81,8 +81,8 @@ export function NoteDetail({ note }: NoteDetailProps) {
   };
 
   return (
-    <div className="flex flex-col h-full overflow-y-auto">
-      <div className="flex-1 px-8 py-8 max-w-3xl mx-auto w-full">
+    <div className="flex flex-col h-full overflow-y-auto overscroll-contain">
+      <div className="flex-1 px-5 sm:px-8 py-8 max-w-4xl mx-auto w-full">
         {/* Header Actions */}
         <div className="flex justify-end gap-2 mb-4">
           {!isEditing ? (
@@ -168,7 +168,7 @@ export function NoteDetail({ note }: NoteDetailProps) {
                   </div>
                 )}
               </div>
-              <div className="prose prose-sm max-w-none">
+              <div className="prose prose-sm max-w-none break-words">
                 <Markdown content={note.content} />
               </div>
             </div>

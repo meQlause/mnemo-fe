@@ -169,7 +169,7 @@ export function RichTextEditor({ content, onChange, placeholder, minHeight = '30
   return (
     <div className="border border-[--color-border] rounded-[--radius-md] overflow-hidden bg-[--color-surface] focus-within:border-[--color-ink] transition-all group/editor relative">
       <MenuBar editor={editor} />
-      <div className="overflow-y-auto max-h-[600px]">
+      <div className="overflow-y-auto overscroll-contain max-h-[600px]">
         <EditorContent editor={editor} />
       </div>
       <style>{`

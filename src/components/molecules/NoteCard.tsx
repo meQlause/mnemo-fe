@@ -36,10 +36,10 @@ export function NoteCard({ note, selected, onClick }: NoteCardProps) {
       onClick={onClick}
       className={cn(
         'w-full text-left px-4 py-3.5 rounded-[--radius-lg]',
-        'border transition-all duration-150 cursor-pointer',
-        'hover:bg-[--color-paper-warm]',
+        'border transition-all duration-200 cursor-pointer',
+        'hover:bg-[--color-surface] hover:border-[--color-border] hover:shadow-[--shadow-sm]',
         selected
-          ? 'bg-[--color-paper-warm] border-[--color-paper-deep] shadow-[--shadow-sm]'
+          ? 'bg-[--color-surface] border-[--color-border] shadow-[--shadow-sm] ring-1 ring-[--color-border-soft]'
           : 'bg-transparent border-transparent'
       )}
     >

@@ -9,7 +9,7 @@ interface AuthLayoutProps {
 
 export function AuthLayout({ children, title, subtitle }: AuthLayoutProps) {
   return (
-    <div className="min-h-screen flex bg-[--color-paper]">
+    <div className="h-full flex flex-col lg:flex-row bg-[--color-paper] overflow-y-auto">
       {/* Left decorative panel */}
       <div
         className="hidden lg:flex flex-col justify-between w-[420px] shrink-0 p-12

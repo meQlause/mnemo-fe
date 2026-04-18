@@ -76,8 +76,8 @@ export function CreateNoteForm({ onSuccess, onCancel }: CreateNoteFormProps) {
   };
 
   return (
-    <div className="flex flex-col h-full overflow-y-auto">
-      <div className="px-8 py-8 max-w-2xl mx-auto w-full flex-1">
+    <div className="flex flex-col h-full overflow-y-auto overscroll-contain">
+      <div className="px-5 sm:px-8 py-8 max-w-4xl mx-auto w-full flex-1">
         <div className="flex items-center justify-between mb-6">
           <h2 className="font-serif text-2xl text-[--color-ink]">New note</h2>
           <button
