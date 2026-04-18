@@ -17,10 +17,6 @@ export function useAutoRefresh() {
     }
 
     timerRef.current = setInterval(async () => {
-      if (!tokenService.getRefresh()) {
-        logout();
-        return;
-      }
       try {
         await authService.refreshTokens();
       } catch {

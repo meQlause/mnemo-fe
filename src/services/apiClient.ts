@@ -99,7 +99,7 @@ export async function apiStreamSSE(
   try {
     const { skipAuth = false, ...init } = options;
 
-    const defaultHeaders: Record<string, string> = {
+    const headers: Record<string, string> = {
       'Content-Type': 'application/json',
     };
 
