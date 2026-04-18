@@ -13,6 +13,8 @@
     "format:check": "prettier --check ."
   },
   "dependencies": {
+    "@tanstack/react-query": "^5.99.1",
+    "@tanstack/react-query-devtools": "^5.99.1",
     "@tiptap/extension-link": "^3.22.3",
     "@tiptap/extension-placeholder": "^3.22.3",
     "@tiptap/react": "^3.22.3",

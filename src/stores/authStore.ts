@@ -22,14 +22,13 @@ export const useAuthStore = create<AuthState>((set) => ({
   error: null,
 
   init: async () => {
-    const refresh = tokenService.getRefresh();
-    if (!refresh) return;
     try {
       await authService.refreshTokens();
       const user = await authService.getMe();
       set({ user, isAuthenticated: true });
     } catch {
       tokenService.clear();
+      set({ user: null, isAuthenticated: false });
     }
   },
 
@@ -53,7 +52,6 @@ export const useAuthStore = create<AuthState>((set) => ({
     try {
       const user = await authService.register(payload);
       set({ user, isLoading: false });
-      // After register, the user needs to login to get tokens (standard OAuth2 flow)
     } catch (err) {
       set({
         error: err instanceof Error ? err.message : 'Registration failed',

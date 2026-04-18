@@ -1,10 +1,11 @@
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import { Plus, Search, Filter, X, Calendar } from 'lucide-react';
 import { NoteCard } from '@/components/molecules/NoteCard';
 import { Button } from '@/components/atoms/Button';
 import { Spinner } from '@/components/atoms/Spinner';
 import { useNotesStore } from '@/stores/notesStore';
-import type { Note } from '@/utils/types';
+import { useNotes, useSearchNotes } from '@/hooks/useNotes';
+import type { Note } from '@/utils/types';  
 import { cn } from '@/utils/cn';
 
 interface NotesListProps {
@@ -13,27 +14,27 @@ interface NotesListProps {
 }
 
 export function NotesList({ onCreateNew, onNoteSelect }: NotesListProps) {
-  const { notes, selectedNote, isLoading, error, fetchNotes, searchNotes, selectNote } =
-    useNotesStore();
+  const selectedNote = useNotesStore((s) => s.selectedNote);
+  const selectNote = useNotesStore((s) => s.selectNote);
+  
   const [query, setQuery] = useState('');
   const [startDate, setStartDate] = useState('');
   const [endDate, setEndDate] = useState('');
   const [isFilterOpen, setIsFilterOpen] = useState(false);
 
-  useEffect(() => {
-    const hasSearch = !!(query.trim() || startDate || endDate);
-    
-    if (!hasSearch) {
-      fetchNotes().catch(() => {});
-      return;
-    }
+  const isSearchActive = !!(query.trim() || startDate || endDate);
 
-    const timer = setTimeout(() => {
-      searchNotes(query, startDate ? `${startDate}T00:00:00` : undefined, endDate ? `${endDate}T23:59:59` : undefined).catch(() => {});
-    }, 500);
+  // Queries
+  const { data: allNotes = [], isLoading: isLoadingAll, error: errorAll } = useNotes();
+  const { data: searchResults, isLoading: isLoadingSearch, error: errorSearch } = useSearchNotes(
+    query, 
+    startDate ? `${startDate}T00:00:00` : undefined, 
+    endDate ? `${endDate}T23:59:59` : undefined
+  );
 
-    return () => clearTimeout(timer);
-  }, [query, startDate, endDate, fetchNotes, searchNotes]);
+  const notes = isSearchActive ? (searchResults ?? []) : allNotes;
+  const isLoading = isSearchActive ? isLoadingSearch : isLoadingAll;
+  const error = (isSearchActive ? errorSearch : errorAll) as Error | null;
 
   const handleSelect = (note: Note) => {
     selectNote(note);
@@ -186,8 +187,8 @@ export function NotesList({ onCreateNew, onNoteSelect }: NotesListProps) {
 
         {!isLoading && error && (
           <div className="text-center py-10 px-4 animate-in fade-in">
-            <p className="text-sm text-[--color-crimson] mb-4">{error}</p>
-            <Button variant="secondary" size="sm" onClick={() => fetchNotes()}>
+            <p className="text-sm text-[--color-crimson] mb-4">{error.message}</p>
+            <Button variant="secondary" size="sm" onClick={() => window.location.reload()}>
               Retry
             </Button>
           </div>

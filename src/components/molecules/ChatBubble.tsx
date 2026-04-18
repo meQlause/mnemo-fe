@@ -1,8 +1,9 @@
 import { cn } from '@/utils/cn';
 import { formatTime } from '@/utils/date';
 import { useNotesStore } from '@/stores/notesStore';
+import { useNotes } from '@/hooks/useNotes';
 import { BookOpen } from 'lucide-react';
-import type { ChatMessage } from '@/utils/types';
+import type { ChatMessage, Note } from '@/utils/types';
 import { Markdown } from '@/components/atoms/Markdown';
 
 interface ChatBubbleProps {
@@ -12,10 +13,10 @@ interface ChatBubbleProps {
 export function ChatBubble({ message }: ChatBubbleProps) {
   const isUser = message.role === 'user';
   const selectNote = useNotesStore((s) => s.selectNote);
-  const notes = useNotesStore((s) => s.notes);
+  const { data: notes = [] } = useNotes();
 
   const handleNoteClick = (id: number) => {
-    const note = notes.find((n) => n.id === id);
+    const note = notes.find((n: Note |undefined) => n?.id === id);
     if (note) selectNote(note);
   };
 

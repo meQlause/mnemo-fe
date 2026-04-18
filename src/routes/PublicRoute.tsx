@@ -9,9 +9,8 @@ interface PublicRouteProps {
 
 export function PublicRoute({ children }: PublicRouteProps) {
   const isAuthenticated = useAuthStore((s) => s.isAuthenticated);
-  const hasRefreshToken = Boolean(tokenService.getRefresh());
 
-  if (isAuthenticated || hasRefreshToken) {
+  if (isAuthenticated) {
     return <Navigate to="/notes" replace />;
   }
 

@@ -1,7 +1,8 @@
 import { useState, useCallback } from 'react';
 import { analyzeNote } from '@/services/aiService';
 import { notesService } from '@/services/notesService';
-import { useNotesStore } from '@/stores/notesStore';
+import { useQueryClient } from '@tanstack/react-query';
+import { NOTE_KEYS } from '@/hooks/useNotes';
 import type { AISummary, AIStreamState } from '@/utils/types';
 import { toast } from 'sonner';
 
@@ -25,7 +26,7 @@ export function useNoteAI(
     sentiment: initialData?.sentiment || '',
   }));
   const [result, setResult] = useState<AISummary | null>(null);
-  const updateNote = useNotesStore((s) => s.updateNote);
+  const queryClient = useQueryClient();
 
   const analyze = useCallback(
     async (noteId?: number) => {
@@ -46,8 +47,8 @@ export function useNoteAI(
 
             if (noteId) {
               try {
-                const updatedNote = await notesService.saveAnalysis(noteId, r);
-                updateNote(updatedNote);
+                await notesService.saveAnalysis(noteId, r);
+                queryClient.invalidateQueries({ queryKey: NOTE_KEYS.all });
               } catch (err) {
                 console.error('Failed to auto-save analysis', err);
                 toast.error('Analysis finished but could not be saved to the database');
@@ -63,7 +64,7 @@ export function useNoteAI(
         setState((s) => ({ ...s, loading: false, streamingField: null }));
       }
     },
-    [content, updateNote]
+    [content, queryClient]
   );
 
   const reset = useCallback(() => {

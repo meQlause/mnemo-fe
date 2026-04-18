@@ -6,12 +6,12 @@ import { Trash2, Pencil, Check, X } from 'lucide-react';
 import { Button } from '@/components/atoms/Button';
 import { Input } from '@/components/atoms/Input';
 import { ConfirmDialog } from '@/components/molecules/ConfirmDialog';
-import { useNotesStore } from '@/stores/notesStore';
 import { useState } from 'react';
 import { toast } from 'sonner';
 import type { Note } from '@/utils/types';
 import { Markdown } from '@/components/atoms/Markdown';
 import { RichTextEditor } from '@/components/molecules/RichTextEditor';
+import { useUpdateNote, useDeleteNote } from '@/hooks/useNotes';
 
 interface NoteDetailProps {
   note: Note;
@@ -28,16 +28,14 @@ export function NoteDetail({ note }: NoteDetailProps) {
     note.id
   );
 
-  const editNote = useNotesStore((s) => s.editNote);
-  const deleteNote = useNotesStore((s) => s.deleteNote);
+  const updateMutation = useUpdateNote();
+  const deleteMutation = useDeleteNote();
 
   const [isEditing, setIsEditing] = useState(false);
   const [editedTitle, setEditedTitle] = useState(note.title);
   const [editedContent, setEditedContent] = useState(note.content);
-  const [isSaving, setIsSaving] = useState(false);
 
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
-  const [isDeleting, setIsDeleting] = useState(false);
 
   const [prevNote, setPrevNote] = useState(note);
   if (note !== prevNote) {
@@ -52,32 +50,28 @@ export function NoteDetail({ note }: NoteDetailProps) {
       return;
     }
 
-    setIsSaving(true);
-    try {
-      await editNote(note.id, {
-        title: editedTitle.trim(),
-        content: editedContent.trim(),
-      });
-      setIsEditing(false);
-      toast.success('Note updated');
-    } catch (err) {
-      toast.error(err instanceof Error ? err.message : 'Failed to update note');
-    } finally {
-      setIsSaving(false);
-    }
+    updateMutation.mutate(
+      {
+        id: note.id,
+        payload: {
+          title: editedTitle.trim(),
+          content: editedContent.trim(),
+        },
+      },
+      {
+        onSuccess: () => {
+          setIsEditing(false);
+        },
+      }
+    );
   };
 
   const handleDelete = async () => {
-    setIsDeleting(true);
-    try {
-      await deleteNote(note.id);
-      toast.success('Note deleted');
-      setIsDeleteDialogOpen(false);
-    } catch {
-      toast.error('Failed to delete note');
-    } finally {
-      setIsDeleting(false);
-    }
+    deleteMutation.mutate(note.id, {
+      onSuccess: () => {
+        setIsDeleteDialogOpen(false);
+      },
+    });
   };
 
   return (
@@ -112,12 +106,12 @@ export function NoteDetail({ note }: NoteDetailProps) {
                 variant="secondary"
                 size="sm"
                 onClick={() => setIsEditing(false)}
-                disabled={isSaving}
+                disabled={updateMutation.isPending}
               >
                 <X className="w-3.5 h-3.5 mr-1.5" />
                 Cancel
               </Button>
-              <Button size="sm" onClick={handleSave} loading={isSaving}>
+              <Button size="sm" onClick={handleSave} loading={updateMutation.isPending}>
                 <Check className="w-3.5 h-3.5 mr-1.5" />
                 Save Changes
               </Button>
@@ -168,7 +162,7 @@ export function NoteDetail({ note }: NoteDetailProps) {
                   </div>
                 )}
               </div>
-              <div className="prose prose-sm max-w-none break-words">
+              <div className="prose prose-sm max-w-none swap-break-words">
                 <Markdown content={note.content} />
               </div>
             </div>
@@ -189,7 +183,7 @@ export function NoteDetail({ note }: NoteDetailProps) {
         isOpen={isDeleteDialogOpen}
         onClose={() => setIsDeleteDialogOpen(false)}
         onConfirm={handleDelete}
-        isLoading={isDeleting}
+        isLoading={deleteMutation.isPending}
         title="Delete Note"
         description="Are you sure you want to delete this note? This action cannot be undone."
         confirmText="Delete Note"

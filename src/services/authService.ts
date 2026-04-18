@@ -25,7 +25,6 @@ export const authService = {
       skipAuth: true,
     });
     tokenService.setAccess(data.access_token);
-    tokenService.setRefresh(data.refresh_token);
     return data;
   },
 
@@ -39,15 +38,11 @@ export const authService = {
   },
 
   async refreshTokens(): Promise<AuthTokens> {
-    const refresh = tokenService.getRefresh();
-    if (!refresh) throw new Error('No refresh token');
     const data = await apiRequest<AuthTokens>('/auth/refresh', {
       method: 'POST',
-      body: JSON.stringify({ refresh_token: refresh }),
       skipAuth: true,
     });
     tokenService.setAccess(data.access_token);
-    tokenService.setRefresh(data.refresh_token);
     return data;
   },
 
@@ -58,7 +53,11 @@ export const authService = {
     return data;
   },
 
-  logout(): void {
-    tokenService.clear();
+  async logout(): Promise<void> {
+    try {
+      await apiRequest('/auth/logout', { method: 'POST' });
+    } finally {
+      tokenService.clear();
+    }
   },
 };

@@ -5,14 +5,30 @@ const BASE_URL = '/api/v1';
 let isRefreshing = false;
 let refreshQueue: Array<(token: string) => void> = [];
 
-async function refreshAccessToken(): Promise<string> {
-  const refresh = tokenService.getRefresh();
-  if (!refresh) throw new Error('No refresh token');
+function getCsrfToken(): string | null {
+  const name = 'fastapi-csrf-token=';
+  const decodedCookie = decodeURIComponent(document.cookie);
+  const ca = decodedCookie.split(';');
+  for (let i = 0; i < ca.length; i++) {
+    let c = ca[i];
+    while (c.charAt(0) === ' ') {
+      c = c.substring(1);
+    }
+    if (c.indexOf(name) === 0) {
+      return c.substring(name.length, c.length);
+    }
+  }
+  return null;
+}
 
+async function refreshAccessToken(): Promise<string> {
   const res = await fetch(`${BASE_URL}/auth/refresh`, {
     method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ refresh_token: refresh }),
+    headers: { 
+      'Content-Type': 'application/json',
+      'X-CSRF-Token': getCsrfToken() || '',
+    },
+    credentials: 'include',
   });
 
   if (!res.ok) {
@@ -22,7 +38,6 @@ async function refreshAccessToken(): Promise<string> {
 
   const data = await res.json();
   tokenService.setAccess(data.access_token);
-  tokenService.setRefresh(data.refresh_token);
   return data.access_token;
 }
 
@@ -88,17 +103,17 @@ export async function apiStreamSSE(
       'Content-Type': 'application/json',
     };
 
-    const headers: Record<string, string> = {
-      ...defaultHeaders,
-      ...(init.headers as Record<string, string>),
-    };
-
     if (!skipAuth) {
       const token = await getValidToken();
       headers['Authorization'] = `Bearer ${token}`;
     }
 
-    const res = await fetch(`${BASE_URL}${path}`, { ...init, headers });
+    if (['POST', 'PUT', 'DELETE', 'PATCH'].includes(init.method?.toUpperCase() || '')) {
+      const csrfToken = getCsrfToken();
+      if (csrfToken) headers['X-CSRF-Token'] = csrfToken;
+    }
+
+    const res = await fetch(`${BASE_URL}${path}`, { ...init, headers, credentials: 'include' });
 
     if (!res.ok) {
       const errorMsg = await parseError(res);
@@ -162,13 +177,21 @@ export async function apiRequest<T>(path: string, options: RequestOptions = {}):
     headers['Authorization'] = `Bearer ${token}`;
   }
 
-  const res = await fetch(`${BASE_URL}${path}`, { ...init, headers });
+  // Add CSRF token for mutations
+  if (['POST', 'PUT', 'DELETE', 'PATCH'].includes(init.method?.toUpperCase() || '')) {
+    const csrfToken = getCsrfToken();
+    if (csrfToken) headers['X-CSRF-Token'] = csrfToken;
+  }
+
+  const res = await fetch(`${BASE_URL}${path}`, { ...init, headers, credentials: 'include' });
 
   if (res.status === 401 && !skipAuth) {
     tokenService.clearAccess();
     const newToken = await getValidToken();
     headers['Authorization'] = `Bearer ${newToken}`;
-    const retry = await fetch(`${BASE_URL}${path}`, { ...init, headers });
+    
+    // Retry with new token and CSRF
+    const retry = await fetch(`${BASE_URL}${path}`, { ...init, headers, credentials: 'include' });
     if (!retry.ok) throw new Error(await parseError(retry));
     return retry.json();
   }

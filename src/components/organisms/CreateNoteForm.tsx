@@ -5,6 +5,9 @@ import { Input } from '@/components/atoms/Input';
 import { RichTextEditor } from '@/components/molecules/RichTextEditor';
 import { useNotesStore } from '@/stores/notesStore';
 import { suggestTitle, generateRandomNote } from '@/services/aiService';
+import { notesService } from '@/services/notesService';
+import { useQueryClient } from '@tanstack/react-query';
+import { NOTE_KEYS } from '@/hooks/useNotes';
 import { X, Loader2, Sparkles, Wand2 } from 'lucide-react';
 
 interface CreateNoteFormProps {
@@ -13,7 +16,8 @@ interface CreateNoteFormProps {
 }
 
 export function CreateNoteForm({ onSuccess, onCancel }: CreateNoteFormProps) {
-  const createNoteStreaming = useNotesStore((s) => s.createNoteStreaming);
+  const queryClient = useQueryClient();
+  const selectNote = useNotesStore((s) => s.selectNote);
   const [title, setTitle] = useState('');
   const [content, setContent] = useState('');
   const [loading, setLoading] = useState(false);
@@ -53,7 +57,7 @@ export function CreateNoteForm({ onSuccess, onCancel }: CreateNoteFormProps) {
 
     setIsGeneratingNote(true);
     setContent('');
-    setTitle(''); // Note content will be new, so clear the title
+    setTitle(''); 
 
     try {
       await generateRandomNote(
@@ -80,10 +84,16 @@ export function CreateNoteForm({ onSuccess, onCancel }: CreateNoteFormProps) {
     setStatus('Initializing');
     
     try {
-      await createNoteStreaming(
+      await notesService.createStreaming(
         { title: title.trim(), content: content.trim() },
         {
           onStatus: (msg) => setStatus(msg),
+          onDone: (note) => {
+            queryClient.invalidateQueries({ queryKey: NOTE_KEYS.all });
+            selectNote(note);
+            toast.success('Note created');
+            onSuccess();
+          },
           onError: (err) => {
             toast.error(err.message || 'Failed to create note');
             setLoading(false);
@@ -91,8 +101,6 @@ export function CreateNoteForm({ onSuccess, onCancel }: CreateNoteFormProps) {
           }
         }
       );
-      toast.success('Note created');
-      onSuccess();
     } catch (err) {
       toast.error(err instanceof Error ? err.message : 'Failed to create note');
       setLoading(false);
