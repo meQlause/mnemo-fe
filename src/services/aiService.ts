@@ -100,10 +100,10 @@ export async function streamChatResponse(
       method: 'POST',
       body: JSON.stringify({
         question: message,
-        history: callbacks.history.map(m => ({
+        history: callbacks.history.map((m) => ({
           role: m.role,
           content: m.content,
-          context_content: m.context_content
+          context_content: m.context_content,
         })),
       }),
     }

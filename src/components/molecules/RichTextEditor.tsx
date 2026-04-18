@@ -177,7 +177,7 @@ export function RichTextEditor({
       const storage = editor.storage as unknown as Record<string, MarkdownStorage>;
       const currentMarkdown = storage.markdown.getMarkdown();
       if (content !== currentMarkdown) {
-        editor.commands.setContent(content, { emitUpdate: false, parseOptions: { preserveWhitespace: 'full' } });
+        editor.commands.setContent(content);
       }
     }
   }, [content, editor]);
