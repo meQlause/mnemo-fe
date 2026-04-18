@@ -172,7 +172,7 @@ export function RichTextEditor({ content, onChange, placeholder, minHeight = '30
       const storage = editor.storage as unknown as Record<string, MarkdownStorage>;
       const currentMarkdown = storage.markdown.getMarkdown();
       if (content !== currentMarkdown) {
-        editor.commands.setContent(content, false, { preserveWhitespace: 'full' });
+        editor.commands.setContent(content);
       }
     }
   }, [content, editor]);
