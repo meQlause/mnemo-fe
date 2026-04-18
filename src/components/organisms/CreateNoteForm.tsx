@@ -4,8 +4,8 @@ import { Button } from '@/components/atoms/Button';
 import { Input } from '@/components/atoms/Input';
 import { RichTextEditor } from '@/components/molecules/RichTextEditor';
 import { useNotesStore } from '@/stores/notesStore';
-import { suggestTitle } from '@/services/aiService';
-import { X, Loader2, Sparkles } from 'lucide-react';
+import { suggestTitle, generateRandomNote } from '@/services/aiService';
+import { X, Loader2, Sparkles, Wand2 } from 'lucide-react';
 
 interface CreateNoteFormProps {
   onSuccess: () => void;
@@ -18,6 +18,7 @@ export function CreateNoteForm({ onSuccess, onCancel }: CreateNoteFormProps) {
   const [content, setContent] = useState('');
   const [loading, setLoading] = useState(false);
   const [isTitleLoading, setIsTitleLoading] = useState(false);
+  const [isGeneratingNote, setIsGeneratingNote] = useState(false);
   const [status, setStatus] = useState<string | null>(null);
 
   const handleSuggestTitle = async () => {
@@ -44,6 +45,30 @@ export function CreateNoteForm({ onSuccess, onCancel }: CreateNoteFormProps) {
       toast.error(err instanceof Error ? err.message : 'Failed to suggest title');
     } finally {
       setIsTitleLoading(false);
+    }
+  };
+
+  const handleGenerateRandomNote = async () => {
+    if (isGeneratingNote) return;
+
+    setIsGeneratingNote(true);
+    setContent('');
+    setTitle(''); // Note content will be new, so clear the title
+
+    try {
+      await generateRandomNote(
+        (chunk) => {
+          setContent(chunk);
+        },
+        (err) => {
+          toast.error(err.message || 'Failed to generate random note');
+          setIsGeneratingNote(false);
+        }
+      );
+    } catch (err) {
+      toast.error(err instanceof Error ? err.message : 'Failed to generate random note');
+    } finally {
+      setIsGeneratingNote(false);
     }
   };
 
@@ -117,9 +142,24 @@ export function CreateNoteForm({ onSuccess, onCancel }: CreateNoteFormProps) {
           </div>
 
           <div className="flex flex-col gap-1.5">
-            <label className="text-xs font-medium text-[--color-ink-soft] uppercase tracking-wider">
-              Content
-            </label>
+            <div className="flex items-center justify-between">
+              <label className="text-xs font-medium text-[--color-ink-soft] uppercase tracking-wider">
+                Content
+              </label>
+              <button
+                type="button"
+                onClick={handleGenerateRandomNote}
+                disabled={isGeneratingNote || loading}
+                className="flex items-center gap-1.5 text-[10px] uppercase tracking-widest font-bold text-[--color-accent] hover:text-[--color-emerald] disabled:opacity-50 transition-colors"
+              >
+                {isGeneratingNote ? (
+                  <Loader2 className="w-3 h-3 animate-spin" />
+                ) : (
+                  <Wand2 className="w-3 h-3" />
+                )}
+                Auto-generate Random Note
+              </button>
+            </div>
             <RichTextEditor
               content={content}
               onChange={setContent}

@@ -131,3 +131,24 @@ export async function suggestTitle(
     }
   );
 }
+
+export async function generateRandomNote(
+  onChunk: (partial: string) => void,
+  onError?: (err: Error) => void
+): Promise<void> {
+  let fullContent = '';
+  await apiStreamSSE(
+    '/notes/generate-random',
+    {
+      onMessage: (data) => {
+        fullContent += data;
+        onChunk(fullContent);
+      },
+      onError,
+    },
+    {
+      method: 'POST',
+      body: JSON.stringify({}),
+    }
+  );
+}
