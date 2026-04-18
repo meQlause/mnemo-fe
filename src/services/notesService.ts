@@ -76,7 +76,10 @@ export const notesService = {
     });
   },
 
-  async search(query: string): Promise<Note[]> {
-    return apiRequest<Note[]>(`/notes/search?query=${encodeURIComponent(query)}`);
+  async search(query: string, startTime?: string, endTime?: string): Promise<Note[]> {
+    let url = `/notes/search?query=${encodeURIComponent(query)}`;
+    if (startTime) url += `&start_time=${encodeURIComponent(startTime)}`;
+    if (endTime) url += `&end_time=${encodeURIComponent(endTime)}`;
+    return apiRequest<Note[]>(url);
   },
 };

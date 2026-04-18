@@ -17,7 +17,7 @@ interface NotesState {
   updateNote: (note: Note) => void;
   editNote: (id: number, payload: Partial<NoteCreate>) => Promise<void>;
   deleteNote: (id: number) => Promise<void>;
-  searchNotes: (query: string) => Promise<void>;
+  searchNotes: (query: string, startTime?: string, endTime?: string) => Promise<void>;
   clearError: () => void;
 }
 
@@ -110,13 +110,13 @@ export const useNotesStore = create<NotesState>((set) => ({
     }
   },
 
-  searchNotes: async (query) => {
-    if (!query.trim()) {
+  searchNotes: async (query, startTime, endTime) => {
+    if (!query.trim() && !startTime && !endTime) {
       return;
     }
     set({ isLoading: true, error: null });
     try {
-      const notes = await notesService.search(query);
+      const notes = await notesService.search(query, startTime, endTime);
       set({ notes, isLoading: false });
     } catch (err) {
       set({
