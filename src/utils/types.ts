@@ -20,6 +20,9 @@ export interface Note {
   summary?: string;
   tags?: string[];
   sentiment?: string;
+  event_date?: string;
+  event_confidence?: string;
+  event_reasoning?: string;
 }
 
 export interface NoteCreate {

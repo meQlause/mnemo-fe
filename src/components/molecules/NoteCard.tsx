@@ -59,6 +59,12 @@ export function NoteCard({ note, selected, onClick }: NoteCardProps) {
       <p className="text-xs text-[--color-ink-mute] line-clamp-2 leading-relaxed">
         {preview || '—'}
       </p>
+      {note.event_date && (
+        <div className="mt-1.5 flex items-center gap-1.5">
+          <span className="text-[9px] text-[--color-ink-mute] uppercase tracking-tighter">Event:</span>
+          <span className="text-[10px] font-bold text-[--color-midnight] opacity-80">{note.event_date}</span>
+        </div>
+      )}
       {note.tags && note.tags.length > 0 && (
         <p className="mt-2 text-[10px] text-[--color-ink-mute] font-mono tracking-tight uppercase line-clamp-1">
           {note.tags.slice(0, 3).join(' • ')}
