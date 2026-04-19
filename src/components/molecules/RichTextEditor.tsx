@@ -123,7 +123,6 @@ export function RichTextEditor({
   const editor = useEditor({
     extensions: [
       StarterKit.configure({
-        // Ensure core functionality is explicitly configured
         heading: {
           levels: [1, 2, 3],
         },

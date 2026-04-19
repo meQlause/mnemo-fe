@@ -21,30 +21,7 @@ function getCsrfToken(): string | null {
   return null;
 }
 
-async function refreshAccessToken(): Promise<string> {
-  const res = await fetch(`${BASE_URL}/auth/refresh`, {
-    method: 'POST',
-    headers: { 
-      'Content-Type': 'application/json',
-      'X-CSRF-Token': getCsrfToken() || '',
-    },
-    credentials: 'include',
-  });
-
-  if (!res.ok) {
-    tokenService.clear();
-    throw new Error('Refresh failed');
-  }
-
-  const data = await res.json();
-  tokenService.setAccess(data.access_token);
-  return data.access_token;
-}
-
-async function getValidToken(): Promise<string> {
-  const token = tokenService.getAccess();
-  if (token) return token;
-
+async function performRefresh(): Promise<string> {
   if (isRefreshing) {
     return new Promise((resolve) => {
       refreshQueue.push(resolve);
@@ -53,13 +30,36 @@ async function getValidToken(): Promise<string> {
 
   isRefreshing = true;
   try {
-    const newToken = await refreshAccessToken();
-    refreshQueue.forEach((cb) => cb(newToken));
+    const csrfToken = getCsrfToken() || '';
+    const res = await fetch(`${BASE_URL}/auth/refresh`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        ...(csrfToken ? { 'X-CSRF-Token': csrfToken } : {}),
+      },
+      credentials: 'include',
+    });
+
+    if (!res.ok) {
+      tokenService.clear();
+      throw new Error('Refresh failed');
+    }
+
+    const data = await res.json();
+    tokenService.setAccess(data.access_token);
+    
+    refreshQueue.forEach((cb) => cb(data.access_token));
     refreshQueue = [];
-    return newToken;
+    return data.access_token;
   } finally {
     isRefreshing = false;
   }
+}
+
+export async function ensureValidToken(): Promise<string> {
+  const token = tokenService.getAccess();
+  if (token) return token;
+  return performRefresh();
 }
 
 interface RequestOptions extends RequestInit {
@@ -104,7 +104,7 @@ export async function apiStreamSSE(
     };
 
     if (!skipAuth) {
-      const token = await getValidToken();
+      const token = await ensureValidToken();
       headers['Authorization'] = `Bearer ${token}`;
     }
 
@@ -173,11 +173,10 @@ export async function apiRequest<T>(path: string, options: RequestOptions = {}):
   };
 
   if (!skipAuth) {
-    const token = await getValidToken();
+    const token = await ensureValidToken();
     headers['Authorization'] = `Bearer ${token}`;
   }
 
-  // Add CSRF token for mutations
   if (['POST', 'PUT', 'DELETE', 'PATCH'].includes(init.method?.toUpperCase() || '')) {
     const csrfToken = getCsrfToken();
     if (csrfToken) headers['X-CSRF-Token'] = csrfToken;
@@ -187,10 +186,9 @@ export async function apiRequest<T>(path: string, options: RequestOptions = {}):
 
   if (res.status === 401 && !skipAuth) {
     tokenService.clearAccess();
-    const newToken = await getValidToken();
+    const newToken = await ensureValidToken();
     headers['Authorization'] = `Bearer ${newToken}`;
-    
-    // Retry with new token and CSRF
+
     const retry = await fetch(`${BASE_URL}${path}`, { ...init, headers, credentials: 'include' });
     if (!retry.ok) throw new Error(await parseError(retry));
     return retry.json();

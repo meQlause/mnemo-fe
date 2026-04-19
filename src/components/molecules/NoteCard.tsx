@@ -8,9 +8,6 @@ interface NoteCardProps {
   onClick: () => void;
 }
 
-/**
- * Strips common markdown syntax for a cleaner plain-text preview
- */
 function stripMarkdown(text: string, maxLen = 120): string {
   if (!text) return '';
   return text
@@ -61,8 +58,12 @@ export function NoteCard({ note, selected, onClick }: NoteCardProps) {
       </p>
       {note.event_date && (
         <div className="mt-1.5 flex items-center gap-1.5">
-          <span className="text-[9px] text-[--color-ink-mute] uppercase tracking-tighter">Event:</span>
-          <span className="text-[10px] font-bold text-[--color-midnight] opacity-80">{note.event_date}</span>
+          <span className="text-[9px] text-[--color-ink-mute] uppercase tracking-tighter">
+            Event:
+          </span>
+          <span className="text-[10px] font-bold text-[--color-midnight] opacity-80">
+            {note.event_date}
+          </span>
         </div>
       )}
       {note.tags && note.tags.length > 0 && (

@@ -7,7 +7,7 @@ interface ModalProps {
   isOpen: boolean;
   onClose: () => void;
   children: ReactNode;
-  title?: string; 
+  title?: string;
   className?: string;
   showCloseButton?: boolean;
 }
@@ -59,9 +59,7 @@ export function Modal({
         )}
       >
         {/* Backward compatible header - Only shows if children doesn't manage its own Header */}
-        {title && (
-          <Modal.Header title={title} onClose={showCloseButton ? onClose : undefined} />
-        )}
+        {title && <Modal.Header title={title} onClose={showCloseButton ? onClose : undefined} />}
 
         {children}
       </div>
@@ -103,7 +101,13 @@ Modal.Header = function ModalHeader({
   );
 };
 
-Modal.Body = function ModalBody({ children, className }: { children: ReactNode; className?: string }) {
+Modal.Body = function ModalBody({
+  children,
+  className,
+}: {
+  children: ReactNode;
+  className?: string;
+}) {
   return <div className={cn('px-6 py-6', className)}>{children}</div>;
 };
 

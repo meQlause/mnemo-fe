@@ -24,9 +24,9 @@ export function RegisterForm() {
     }
     try {
       await register({ username, email, password });
-      
+
       await login({ username, password });
-      
+
       toast.success('Account created and logged in!');
       navigate('/notes');
     } catch (err) {

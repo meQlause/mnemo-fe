@@ -29,26 +29,26 @@ export function ConfirmDialog({
   return (
     <Modal isOpen={isOpen} onClose={onClose} showCloseButton={false} className="max-w-md">
       <Modal.Body className="flex flex-col items-center text-center py-10">
-        <div 
+        <div
           className={cn(
-            "w-16 h-16 rounded-full flex items-center justify-center mb-6 animate-in zoom-in duration-300",
-            variant === 'danger' ? "bg-[--color-crimson-soft]" : "bg-[--color-accent-soft]"
+            'w-16 h-16 rounded-full flex items-center justify-center mb-6 animate-in zoom-in duration-300',
+            variant === 'danger' ? 'bg-[--color-crimson-soft]' : 'bg-[--color-accent-soft]'
           )}
         >
-          <AlertTriangle 
+          <AlertTriangle
             className={cn(
-              "w-8 h-8",
-              variant === 'danger' ? "text-[--color-crimson]" : "text-[--color-accent]"
-            )} 
+              'w-8 h-8',
+              variant === 'danger' ? 'text-[--color-crimson]' : 'text-[--color-accent]'
+            )}
           />
         </div>
-        
+
         <h3 className="font-serif text-3xl text-[--color-ink] mb-3 tracking-tight">{title}</h3>
         <p className="text-sm text-[--color-ink-soft] leading-relaxed max-w-[320px] mx-auto">
           {description}
         </p>
       </Modal.Body>
-      
+
       <Modal.Footer className="bg-[--color-paper-light] border-none px-8 pb-8 pt-0 flex-col gap-3">
         <Button
           variant={variant === 'danger' ? 'danger' : 'primary'}

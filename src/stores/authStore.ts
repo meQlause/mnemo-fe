@@ -7,6 +7,7 @@ interface AuthState {
   user: User | null;
   isAuthenticated: boolean;
   isLoading: boolean;
+  isInitialized: boolean;
   error: string | null;
   init: () => Promise<void>;
   login: (payload: LoginPayload) => Promise<void>;
@@ -19,16 +20,17 @@ export const useAuthStore = create<AuthState>((set) => ({
   user: null,
   isAuthenticated: false,
   isLoading: false,
+  isInitialized: false,
   error: null,
 
   init: async () => {
     try {
       await authService.refreshTokens();
       const user = await authService.getMe();
-      set({ user, isAuthenticated: true });
+      set({ user, isAuthenticated: true, isInitialized: true });
     } catch {
       tokenService.clear();
-      set({ user: null, isAuthenticated: false });
+      set({ user: null, isAuthenticated: false, isInitialized: true });
     }
   },
 

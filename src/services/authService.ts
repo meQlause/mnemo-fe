@@ -1,4 +1,4 @@
-import { apiRequest } from './apiClient';
+import { apiRequest, ensureValidToken } from './apiClient';
 import { tokenService } from './tokenService';
 import type { AuthTokens, User } from '@/utils/types';
 
@@ -38,12 +38,8 @@ export const authService = {
   },
 
   async refreshTokens(): Promise<AuthTokens> {
-    const data = await apiRequest<AuthTokens>('/auth/refresh', {
-      method: 'POST',
-      skipAuth: true,
-    });
-    tokenService.setAccess(data.access_token);
-    return data;
+    const access_token = await ensureValidToken();
+    return { access_token, token_type: 'bearer' };
   },
 
   async getMe(): Promise<User> {

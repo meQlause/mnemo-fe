@@ -32,7 +32,7 @@ export function CreateNoteForm({ onSuccess, onCancel }: CreateNoteFormProps) {
     }
 
     setIsTitleLoading(true);
-    setTitle(''); 
+    setTitle('');
 
     try {
       await suggestTitle(
@@ -57,7 +57,7 @@ export function CreateNoteForm({ onSuccess, onCancel }: CreateNoteFormProps) {
 
     setIsGeneratingNote(true);
     setContent('');
-    setTitle(''); 
+    setTitle('');
 
     try {
       await generateRandomNote(
@@ -79,10 +79,10 @@ export function CreateNoteForm({ onSuccess, onCancel }: CreateNoteFormProps) {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!content.trim()) return;
-    
+
     setLoading(true);
     setStatus('Initializing');
-    
+
     try {
       await notesService.createStreaming(
         { title: title.trim(), content: content.trim() },
@@ -98,7 +98,7 @@ export function CreateNoteForm({ onSuccess, onCancel }: CreateNoteFormProps) {
             toast.error(err.message || 'Failed to create note');
             setLoading(false);
             setStatus(null);
-          }
+          },
         }
       );
     } catch (err) {
@@ -175,7 +175,7 @@ export function CreateNoteForm({ onSuccess, onCancel }: CreateNoteFormProps) {
               minHeight="350px"
             />
           </div>
-          
+
           <div className="flex items-center justify-between pt-2">
             <div className="flex items-center gap-3">
               <Button type="submit" loading={loading} disabled={!content.trim()}>
@@ -185,7 +185,7 @@ export function CreateNoteForm({ onSuccess, onCancel }: CreateNoteFormProps) {
                 Cancel
               </Button>
             </div>
-            
+
             {loading && status && (
               <div className="flex items-center gap-2 text-sm text-[--color-accent] font-medium animate-in fade-in slide-in-from-right-2">
                 <Loader2 className="w-3.5 h-3.5 animate-spin" />

@@ -1,6 +1,5 @@
 import { useEffect, useRef } from 'react';
 import { authService } from '@/services/authService';
-import { tokenService } from '@/services/tokenService';
 import { useAuthStore } from '@/stores/authStore';
 
 const REFRESH_INTERVAL = 4 * 60 * 1000;

@@ -5,7 +5,7 @@ import { Button } from '@/components/atoms/Button';
 import { Spinner } from '@/components/atoms/Spinner';
 import { useNotesStore } from '@/stores/notesStore';
 import { useNotes, useSearchNotes } from '@/hooks/useNotes';
-import type { Note } from '@/utils/types';  
+import type { Note } from '@/utils/types';
 import { cn } from '@/utils/cn';
 
 interface NotesListProps {
@@ -16,7 +16,7 @@ interface NotesListProps {
 export function NotesList({ onCreateNew, onNoteSelect }: NotesListProps) {
   const selectedNote = useNotesStore((s) => s.selectedNote);
   const selectNote = useNotesStore((s) => s.selectNote);
-  
+
   const [query, setQuery] = useState('');
   const [startDate, setStartDate] = useState('');
   const [endDate, setEndDate] = useState('');
@@ -26,9 +26,13 @@ export function NotesList({ onCreateNew, onNoteSelect }: NotesListProps) {
 
   // Queries
   const { data: allNotes = [], isLoading: isLoadingAll, error: errorAll } = useNotes();
-  const { data: searchResults, isLoading: isLoadingSearch, error: errorSearch } = useSearchNotes(
-    query, 
-    startDate ? `${startDate}T00:00:00` : undefined, 
+  const {
+    data: searchResults,
+    isLoading: isLoadingSearch,
+    error: errorSearch,
+  } = useSearchNotes(
+    query,
+    startDate ? `${startDate}T00:00:00` : undefined,
     endDate ? `${endDate}T23:59:59` : undefined
   );
 
@@ -44,7 +48,7 @@ export function NotesList({ onCreateNew, onNoteSelect }: NotesListProps) {
   const setShorthand = (period: 'week' | 'month' | 'year') => {
     const start = new Date();
     const end = new Date();
-    
+
     if (period === 'week') {
       start.setDate(start.getDate() - 14);
       end.setDate(end.getDate() - 7);
@@ -103,8 +107,10 @@ export function NotesList({ onCreateNew, onNoteSelect }: NotesListProps) {
             <button
               onClick={() => setIsFilterOpen(!isFilterOpen)}
               className={cn(
-                "absolute right-2 top-1/2 -translate-y-1/2 p-1 rounded transition-colors",
-                isFilterOpen || hasActiveFilters ? "text-[--color-accent] bg-[--color-accent]/10" : "text-[--color-ink-mute] hover:bg-[--color-paper-mid]"
+                'absolute right-2 top-1/2 -translate-y-1/2 p-1 rounded transition-colors',
+                isFilterOpen || hasActiveFilters
+                  ? 'text-[--color-accent] bg-[--color-accent]/10'
+                  : 'text-[--color-ink-mute] hover:bg-[--color-paper-mid]'
               )}
               title="Toggle filters"
             >
@@ -114,26 +120,26 @@ export function NotesList({ onCreateNew, onNoteSelect }: NotesListProps) {
 
           {/* Quick Filters */}
           <div className="flex items-center gap-1.5 overflow-x-auto no-scrollbar pb-0.5">
-            <button 
+            <button
               onClick={() => setShorthand('week')}
               className="text-[10px] px-2 py-0.5 rounded-full border border-[--color-border-soft] text-[--color-ink-soft] hover:bg-[--color-paper-mid] whitespace-nowrap transition-colors"
             >
               Last Week
             </button>
-            <button 
+            <button
               onClick={() => setShorthand('month')}
               className="text-[10px] px-2 py-0.5 rounded-full border border-[--color-border-soft] text-[--color-ink-soft] hover:bg-[--color-paper-mid] whitespace-nowrap transition-colors"
             >
               Last Month
             </button>
-            <button 
+            <button
               onClick={() => setShorthand('year')}
               className="text-[10px] px-2 py-0.5 rounded-full border border-[--color-border-soft] text-[--color-ink-soft] hover:bg-[--color-paper-mid] whitespace-nowrap transition-colors"
             >
               Last Year
             </button>
             {(query || hasActiveFilters) && (
-              <button 
+              <button
                 onClick={clearFilters}
                 className="text-[10px] px-2 py-0.5 rounded-full border border-[--color-crimson]/20 text-[--color-crimson] hover:bg-[--color-crimson]/10 whitespace-nowrap transition-colors flex items-center gap-1"
               >
@@ -148,10 +154,12 @@ export function NotesList({ onCreateNew, onNoteSelect }: NotesListProps) {
             <div className="flex flex-col gap-2 p-2 bg-[--color-paper-mid]/30 rounded-[--radius-md] border border-[--color-border-soft] animate-in slide-in-from-top-1 duration-200">
               <div className="grid grid-cols-2 gap-2">
                 <div className="flex flex-col gap-1">
-                  <label className="text-[10px] font-medium text-[--color-ink-mute] uppercase tracking-wider">From</label>
+                  <label className="text-[10px] font-medium text-[--color-ink-mute] uppercase tracking-wider">
+                    From
+                  </label>
                   <div className="relative">
                     <Calendar className="absolute left-2 top-1/2 -translate-y-1/2 w-2.5 h-2.5 text-[--color-ink-mute]" />
-                    <input 
+                    <input
                       type="date"
                       value={startDate}
                       onChange={(e) => setStartDate(e.target.value)}
@@ -160,10 +168,12 @@ export function NotesList({ onCreateNew, onNoteSelect }: NotesListProps) {
                   </div>
                 </div>
                 <div className="flex flex-col gap-1">
-                  <label className="text-[10px] font-medium text-[--color-ink-mute] uppercase tracking-wider">To</label>
+                  <label className="text-[10px] font-medium text-[--color-ink-mute] uppercase tracking-wider">
+                    To
+                  </label>
                   <div className="relative">
                     <Calendar className="absolute left-2 top-1/2 -translate-y-1/2 w-2.5 h-2.5 text-[--color-ink-mute]" />
-                    <input 
+                    <input
                       type="date"
                       value={endDate}
                       onChange={(e) => setEndDate(e.target.value)}

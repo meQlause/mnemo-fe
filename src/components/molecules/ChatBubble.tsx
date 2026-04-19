@@ -16,7 +16,7 @@ export function ChatBubble({ message }: ChatBubbleProps) {
   const { data: notes = [] } = useNotes();
 
   const handleNoteClick = (id: number) => {
-    const note = notes.find((n: Note |undefined) => n?.id === id);
+    const note = notes.find((n: Note | undefined) => n?.id === id);
     if (note) selectNote(note);
   };
 

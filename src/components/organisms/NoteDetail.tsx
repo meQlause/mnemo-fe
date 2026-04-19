@@ -172,39 +172,51 @@ export function NoteDetail({ note }: NoteDetailProps) {
                   <button
                     onClick={() => setShowEventDetails(!showEventDetails)}
                     className={cn(
-                      "flex items-center gap-2 px-3 py-1.5 rounded-full text-[10px] font-bold tracking-wider uppercase transition-all duration-300 shadow-sm border",
-                      showEventDetails 
-                        ? "bg-[--color-midnight] text-white border-[--color-midnight] shadow-[--shadow-md]" 
-                        : "bg-white text-[--color-accent] border-[--color-accent]/20 hover:border-[--color-accent] hover:shadow-md"
+                      'flex items-center gap-2 px-3 py-1.5 rounded-full text-[10px] font-bold tracking-wider uppercase transition-all duration-300 shadow-sm border',
+                      showEventDetails
+                        ? 'bg-[--color-midnight] text-white border-[--color-midnight] shadow-[--shadow-md]'
+                        : 'bg-white text-[--color-accent] border-[--color-accent]/20 hover:border-[--color-accent] hover:shadow-md'
                     )}
                   >
-                    <Sparkles className={cn("w-3 h-3", showEventDetails ? "animate-pulse" : "")} />
+                    <Sparkles className={cn('w-3 h-3', showEventDetails ? 'animate-pulse' : '')} />
                     {showEventDetails ? 'Close Insights' : 'AI Metadata'}
                   </button>
 
                   {showEventDetails && (
                     <div className="absolute top-10 right-0 w-80 p-5 bg-white/95 backdrop-blur-md rounded-2xl border border-[--color-border-soft] shadow-2xl animate-in fade-in slide-in-from-top-2 duration-300 z-30">
                       <div className="flex items-center gap-3 mb-4">
-                        <span className="text-[10px] font-mono uppercase tracking-widest text-[--color-ink-mute]">Extraction Engine</span>
+                        <span className="text-[10px] font-mono uppercase tracking-widest text-[--color-ink-mute]">
+                          Extraction Engine
+                        </span>
                         <div className="h-px flex-1 bg-[--color-border-soft]" />
-                        <span className={`text-[9px] font-bold px-2 py-0.5 rounded-full border ${
-                          note.event_confidence === 'HIGH' ? 'border-emerald-200 text-emerald-600 bg-emerald-50' : 
-                          note.event_confidence === 'MEDIUM' ? 'border-amber-200 text-amber-600 bg-amber-50' : 
-                          'border-slate-200 text-slate-500 bg-slate-50'
-                        }`}>
+                        <span
+                          className={`text-[9px] font-bold px-2 py-0.5 rounded-full border ${
+                            note.event_confidence === 'HIGH'
+                              ? 'border-emerald-200 text-emerald-600 bg-emerald-50'
+                              : note.event_confidence === 'MEDIUM'
+                                ? 'border-amber-200 text-amber-600 bg-amber-50'
+                                : 'border-slate-200 text-slate-500 bg-slate-50'
+                          }`}
+                        >
                           {note.event_confidence}
                         </span>
                       </div>
-                      
+
                       <div className="space-y-4">
                         <div className="flex flex-col gap-1">
-                          <span className="text-[9px] uppercase tracking-tighter text-[--color-ink-mute]">Resolved Date</span>
-                          <span className="text-sm font-serif font-bold text-[--color-midnight]">{note.event_date}</span>
+                          <span className="text-[9px] uppercase tracking-tighter text-[--color-ink-mute]">
+                            Resolved Date
+                          </span>
+                          <span className="text-sm font-serif font-bold text-[--color-midnight]">
+                            {note.event_date}
+                          </span>
                         </div>
 
                         {note.event_reasoning && (
                           <div className="flex flex-col gap-1 pt-3 border-t border-[--color-border-soft]">
-                            <span className="text-[9px] uppercase tracking-tighter text-[--color-ink-mute]">Logic & Reasoning</span>
+                            <span className="text-[9px] uppercase tracking-tighter text-[--color-ink-mute]">
+                              Logic & Reasoning
+                            </span>
                             <p className="text-[12px] text-slate-600 italic leading-relaxed">
                               &ldquo;{note.event_reasoning}&rdquo;
                             </p>
@@ -215,7 +227,7 @@ export function NoteDetail({ note }: NoteDetailProps) {
                   )}
                 </div>
               )}
-              <div className="prose prose-sm max-w-none swap-break-words">
+              <div className="prose prose-sm max-w-none wrap-break-words">
                 <Markdown content={note.content} />
               </div>
             </div>

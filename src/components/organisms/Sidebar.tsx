@@ -61,7 +61,7 @@ export function Sidebar({ className }: SidebarProps) {
       {/* User footer */}
       <div className="py-4 flex flex-col gap-3 w-full px-2 border-t border-[--color-border-soft] items-center">
         {user && (
-          <div 
+          <div
             className="w-8 h-8 rounded-full bg-[--color-ink-mute] text-[--color-paper] flex items-center justify-center text-xs font-bold uppercase cursor-default"
             title={user.username ?? user.email}
           >

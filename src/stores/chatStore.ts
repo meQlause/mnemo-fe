@@ -38,8 +38,6 @@ export const useChatStore = create<ChatState>((set) => ({
           ? {
               ...m,
               ...updates,
-              // If updates has context, merge it or replace it? 
-              // Usually, context comes all at once, so replace is fine.
             }
           : m
       ),
