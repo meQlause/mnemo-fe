@@ -44,16 +44,21 @@ export function NotesFeature() {
       <div
         className={cn(
           'shrink-0 border-[--color-border] h-full overflow-hidden transition-all duration-300 ease-in-out',
-          isListVisible ? 'w-80 border-r opacity-100' : 'w-0 border-r-0 opacity-0'
+          isListVisible 
+            ? 'w-full md:w-80 border-r opacity-100' 
+            : 'w-0 border-r-0 opacity-0'
         )}
       >
-        <div className="w-80 h-full">
+        <div className="w-full md:w-80 h-full">
           <NotesList onCreateNew={handleCreateNew} onNoteSelect={handleNoteSelect} />
         </div>
       </div>
 
       {/* Main content panel */}
-      <div className="flex-1 h-full overflow-hidden relative">
+      <div className={cn(
+        "flex-1 h-full overflow-hidden relative",
+        isListVisible && "hidden md:block"
+      )}>
         <button
           onClick={() => setIsListVisible(!isListVisible)}
           className={cn(

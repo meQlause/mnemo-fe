@@ -49,7 +49,7 @@ export function ChatWindow() {
       </div>
 
       {/* Messages */}
-      <div className="flex-1 overflow-y-auto overscroll-contain px-6 py-6 flex flex-col gap-5 border-b border-[--color-border-soft]">
+      <div className="flex-1 overflow-y-auto overscroll-contain px-6 py-6 flex flex-col gap-5 border-b-0 md:border-b border-[--color-border-soft]">
         {messages.length === 0 && (
           <div className="flex-1 flex flex-col items-center justify-center text-center py-16">
             <div className="w-12 h-12 rounded-full bg-[--color-accent-soft] flex items-center justify-center mb-4">
@@ -70,7 +70,7 @@ export function ChatWindow() {
       </div>
 
       {/* Input */}
-      <div className="px-6 py-4 border-t border-[--color-border] shrink-0">
+      <div className="px-6 py-4 border-t-0 md:border-t border-[--color-border] shrink-0">
         <div
           className={cn(
             'flex items-end gap-3 bg-[--color-surface] border rounded-[--radius-lg] px-4 py-3',
