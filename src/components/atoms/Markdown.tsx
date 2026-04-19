@@ -1,5 +1,6 @@
 import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
+import rehypeHighlight from 'rehype-highlight';
 import { cn } from '@/utils/cn';
 
 interface MarkdownProps {
@@ -22,7 +23,8 @@ export function Markdown({ content, className, compact = false }: MarkdownProps)
         'prose-ol:list-decimal prose-ol:my-4 prose-ol:pl-5',
         'prose-li:text-[--color-ink-soft] prose-li:my-1',
         'prose-code:px-1.5 prose-code:py-0.5 prose-code:rounded-sm prose-code:bg-[--color-paper-mid] prose-code:text-[--color-ink] prose-code:font-mono prose-code:text-[0.85em] prose-code:before:content-none prose-code:after:content-none',
-        'prose-pre:bg-[--color-paper-mid] prose-pre:border prose-pre:border-[--color-border-soft] prose-pre:rounded-[--radius-md] prose-pre:p-4',
+        'prose-pre:bg-[--color-paper-mid] prose-pre:border prose-pre:border-[--color-border-soft] prose-pre:rounded-[--radius-md] prose-pre:p-4 prose-pre:my-6',
+        'prose-pre:shadow-sm',
         'prose-blockquote:border-l-4 prose-blockquote:border-[--color-accent] prose-blockquote:pl-4 prose-blockquote:italic prose-blockquote:text-[--color-ink-mute] prose-blockquote:my-6',
         'prose-hr:border-[--color-border-soft] prose-hr:my-8',
         'prose-a:text-[--color-accent] prose-a:no-underline hover:prose-a:underline',
@@ -30,7 +32,10 @@ export function Markdown({ content, className, compact = false }: MarkdownProps)
         className
       )}
     >
-      <ReactMarkdown remarkPlugins={[remarkGfm]}>
+      <ReactMarkdown 
+        remarkPlugins={[remarkGfm]} 
+        rehypePlugins={[rehypeHighlight]}
+      >
         {content}
       </ReactMarkdown>
     </div>

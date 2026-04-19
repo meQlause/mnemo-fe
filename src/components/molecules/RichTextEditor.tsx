@@ -14,9 +14,14 @@ import {
   Quote,
   Heading1,
   Heading2,
+  Code,
   Undo,
   Redo,
 } from 'lucide-react';
+import CodeBlockLowlight from '@tiptap/extension-code-block-lowlight';
+import { common, createLowlight } from 'lowlight';
+
+const lowlight = createLowlight(common);
 
 interface RichTextEditorProps {
   content: string;
@@ -70,6 +75,12 @@ function MenuBar({ editor }: { editor: Editor | null }) {
       title: 'Blockquote',
       action: () => editor.chain().focus().toggleBlockquote().run(),
       isActive: editor.isActive('blockquote'),
+    },
+    {
+      icon: Code,
+      title: 'Code Block',
+      action: () => editor.chain().focus().toggleCodeBlock().run(),
+      isActive: editor.isActive('codeBlock'),
     },
   ];
 
@@ -149,6 +160,9 @@ export function RichTextEditor({
         linkify: true,
         breaks: true,
       }),
+      CodeBlockLowlight.configure({
+        lowlight,
+      }),
     ],
     content,
     onUpdate: ({ editor }) => {
@@ -201,6 +215,33 @@ export function RichTextEditor({
         .tiptap blockquote { border-left: 3px solid var(--color-accent); padding-left: 1rem; color: var(--color-ink-mute); }
         .tiptap h1 { font-size: 1.5em; font-weight: bold; margin-bottom: 0.5em; }
         .tiptap h2 { font-size: 1.25em; font-weight: bold; margin-bottom: 0.5em; }
+        
+        /* Code block styling */
+        .tiptap pre {
+          background: var(--color-paper-deep);
+          color: var(--color-ink);
+          font-family: var(--font-mono);
+          padding: 0.75rem 1rem;
+          border-radius: var(--radius-md);
+          margin: 1rem 0;
+          border: 1px solid var(--color-border-soft);
+        }
+        .tiptap pre code {
+          color: inherit;
+          padding: 0;
+          background: none;
+          font-size: 0.9rem;
+        }
+        
+        /* Syntax highlighting colors */
+        .hljs-comment, .hljs-quote { color: #8a8480; italic; }
+        .hljs-keyword, .hljs-selector-tag, .hljs-addition { color: #c9773a; font-weight: bold; }
+        .hljs-number, .hljs-string, .hljs-meta .hljs-meta-string, .hljs-literal, .hljs-doctag, .hljs-regexp { color: #2d6a4f; }
+        .hljs-title, .hljs-section, .hljs-name, .hljs-selector-id, .hljs-selector-class { color: #2a6496; }
+        .hljs-attribute, .hljs-attr, .hljs-variable, .hljs-template-variable, .hljs-class .hljs-title, .hljs-type { color: #e8893d; }
+        .hljs-symbol, .hljs-bullet, .hljs-subst, .hljs-meta, .hljs-link { color: #9b2335; }
+        .hljs-emphasis { font-style: italic; }
+        .hljs-strong { font-weight: bold; }
       `}</style>
     </div>
   );
