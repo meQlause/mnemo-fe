@@ -111,11 +111,13 @@ export function CreateNoteForm({ onSuccess, onCancel }: CreateNoteFormProps) {
   return (
     <div className="flex flex-col h-full overflow-y-auto overscroll-contain">
       <div className="px-5 sm:px-8 py-8 max-w-4xl mx-auto w-full flex-1">
-        <div className="flex items-center justify-between mb-6">
-          <h2 className="font-serif text-2xl text-[--color-ink]">New note</h2>
+        <div className="flex items-center justify-between mb-6 relative">
+          <h2 className="font-serif text-2xl text-[--color-ink] w-full text-center sm:text-left">
+            New note
+          </h2>
           <button
             onClick={onCancel}
-            className="w-8 h-8 flex items-center justify-center rounded-full hover:bg-[--color-paper-mid] transition-colors"
+            className="absolute right-0 sm:relative w-8 h-8 flex items-center justify-center rounded-full hover:bg-[--color-paper-mid] transition-colors"
           >
             <X className="w-4 h-4 text-[--color-ink-mute]" />
           </button>
