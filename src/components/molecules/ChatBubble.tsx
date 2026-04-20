@@ -5,12 +5,15 @@ import { useNotes } from '@/hooks/useNotes';
 import { BookOpen } from 'lucide-react';
 import type { ChatMessage, Note } from '@/utils/types';
 import { Markdown } from '@/components/atoms/Markdown';
+import { Button } from '@/components/atoms/Button';
 
 interface ChatBubbleProps {
   message: ChatMessage;
+  onSelectNote?: (id: number) => void;
+  onViewNote?: (note: Partial<Note>) => void;
 }
 
-export function ChatBubble({ message }: ChatBubbleProps) {
+export function ChatBubble({ message, onSelectNote, onViewNote }: ChatBubbleProps) {
   const isUser = message.role === 'user';
   const selectNote = useNotesStore((s) => s.selectNote);
   const { data: notes = [] } = useNotes();
@@ -48,7 +51,7 @@ export function ChatBubble({ message }: ChatBubbleProps) {
             ) : message.content ? (
               <Markdown content={message.content} compact />
             ) : (
-              !message.status && (
+              !message.status && !message.candidate_notes && (
                 <span className="flex gap-1 items-center py-0.5">
                   <span
                     className="w-1.5 h-1.5 rounded-full bg-[--color-ink-mute] animate-pulse-soft"
@@ -67,6 +70,55 @@ export function ChatBubble({ message }: ChatBubbleProps) {
             )}
           </div>
 
+          {!isUser && message.candidate_notes && message.candidate_notes.length > 0 && (
+            <div className="mt-4 flex flex-col gap-3">
+              <p className="text-[10px] font-bold uppercase tracking-widest text-[--color-ink-mute] mb-1">
+                Select the correct note:
+              </p>
+              <div className="flex flex-col gap-2">
+                {message.candidate_notes.map((note, idx) => (
+                  <div
+                    key={`candidate-${note.id}-${idx}`}
+                    className={cn(
+                      "group p-3 rounded-[--radius-md] border transition-all",
+                      "bg-[--color-paper] border-[--color-border-soft] hover:border-[--color-accent] hover:shadow-[--shadow-sm]",
+                      "flex flex-col gap-2"
+                    )}
+                  >
+                    <div className="flex flex-col gap-1 cursor-pointer" onClick={() => onViewNote?.(note)}>
+                      <span className="font-semibold text-sm text-[--color-ink] group-hover:text-[--color-accent] transition-colors leading-tight">
+                        {note.title || 'Untitled Note'}
+                      </span>
+                      {note.content && (
+                        <span className="text-[11px] text-[--color-ink-mute] line-clamp-2 leading-relaxed">
+                          {note.content.substring(0, 150)}...
+                        </span>
+                      )}
+                    </div>
+                    
+                    <div className="flex gap-2 mt-1">
+                      <Button 
+                        size="xs" 
+                        className="flex-1 text-[10px] h-7"
+                        onClick={() => onSelectNote?.(note.id!)}
+                      >
+                        Select Note
+                      </Button>
+                      <Button 
+                        variant="secondary" 
+                        size="xs" 
+                        className="flex-1 text-[10px] h-7"
+                        onClick={() => onViewNote?.(note)}
+                      >
+                        View Details
+                      </Button>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
+
           {!isUser && message.context && message.context.length > 0 && (
             <div className="mt-4 pt-4 border-t border-[--color-border-soft]">
               <details className="group">
@@ -78,9 +130,9 @@ export function ChatBubble({ message }: ChatBubbleProps) {
                   </span>
                 </summary>
                 <div className="flex flex-col gap-1.5 mt-3 pl-4 border-l border-[--color-border-soft]">
-                  {message.context.map((ctx) => (
+                  {message.context.map((ctx, idx) => (
                     <button
-                      key={ctx.id}
+                      key={`ctx-${ctx.id}-${idx}`}
                       onClick={() => handleNoteClick(ctx.id)}
                       className="text-left py-1 text-[11px] text-[--color-ink-soft] hover:text-[--color-ink] hover:underline underline-offset-2 transition-all w-fit"
                     >

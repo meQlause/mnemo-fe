@@ -2,7 +2,7 @@ import { forwardRef, type ButtonHTMLAttributes } from 'react';
 import { cn } from '@/utils/cn';
 
 type Variant = 'primary' | 'secondary' | 'ghost' | 'danger';
-type Size = 'sm' | 'md' | 'lg';
+type Size = 'xs' | 'sm' | 'md' | 'lg';
 
 interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
   variant?: Variant;
@@ -19,6 +19,7 @@ const variantStyles: Record<Variant, string> = {
 };
 
 const sizeStyles: Record<Size, string> = {
+  xs: 'px-2 py-1 text-[10px] rounded-[--radius-sm]',
   sm: 'px-3 py-1.5 text-sm rounded-[--radius-sm]',
   md: 'px-4 py-2 text-sm rounded-[--radius-md]',
   lg: 'px-6 py-3 text-base rounded-[--radius-md]',

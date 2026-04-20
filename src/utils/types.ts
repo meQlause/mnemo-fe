@@ -39,6 +39,7 @@ export interface ChatMessage {
   status?: string;
   context?: { id: number; title: string }[];
   context_content?: string;
+  candidate_notes?: Partial<Note>[];
 }
 
 export interface AISummary {

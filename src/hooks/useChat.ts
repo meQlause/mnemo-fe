@@ -2,23 +2,40 @@ import { useCallback } from 'react';
 import { toast } from 'sonner';
 import { useChatStore } from '@/stores/chatStore';
 import { streamChatResponse } from '@/services/aiService';
+import { ChatMessage } from '@/utils/types';
 
 export function useChat() {
   const { addMessage, updateMessage, setStreaming, setError, isStreaming } = useChatStore();
 
   const sendMessage = useCallback(
-    async (text: string) => {
+    async (text: string, selectedNoteId?: number) => {
       if (!text.trim() || isStreaming) return;
 
-      addMessage({ role: 'user', content: text });
+      let assistantMsg: ChatMessage;
 
-      const assistantMsg = addMessage({
-        role: 'assistant',
-        content: '',
-        streaming: true,
-      });
+      if (selectedNoteId) {
+        assistantMsg = addMessage({
+          role: 'assistant',
+          content: '',
+          streaming: true,
+          status: 'Directing to selected note...',
+        });
+      } else {
+        addMessage({ role: 'user', content: text });
+        assistantMsg = addMessage({
+          role: 'assistant',
+          content: '',
+          streaming: true,
+        });
+      }
 
       const messages = useChatStore.getState().messages;
+
+      const lastAssistantWithContext = [...messages]
+        .reverse()
+        .find((m) => m.role === 'assistant' && m.context_content);
+      const contextContent = lastAssistantWithContext?.context_content;
+
       const history = messages
         .filter((m) => m.id !== assistantMsg.id)
         .map((m) => ({ 
@@ -33,6 +50,8 @@ export function useChat() {
       try {
         await streamChatResponse(text, {
           history,
+          selectedNoteId,
+          contextContent, 
           onChunk: (content) => {
             updateMessage(assistantMsg.id, { content, status: '' });
           },
@@ -45,18 +64,28 @@ export function useChat() {
           onContextContent: (context_content) => {
             updateMessage(assistantMsg.id, { context_content });
           },
+          onSelectionRequired: (candidate_notes) => {
+            updateMessage(assistantMsg.id, { 
+              candidate_notes, 
+              streaming: false,
+              status: 'Please select a note to continue'
+            });
+            setStreaming(false);
+          },
           onError: (err) => {
             throw err;
           },
         });
 
-        updateMessage(assistantMsg.id, { streaming: false, status: '' });
+        if (useChatStore.getState().isStreaming) {
+          updateMessage(assistantMsg.id, { streaming: false, status: '' });
+        }
       } catch (err) {
         const msg = err instanceof Error ? err.message : 'Chat failed';
         setError(msg);
         toast.error(msg);
         updateMessage(assistantMsg.id, {
-          content: 'Sorry, something went wrong.',
+          content: `Sorry, something went wrong: ${msg}`,
           streaming: false,
           status: '',
         });

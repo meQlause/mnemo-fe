@@ -1,5 +1,5 @@
 import { apiStreamSSE } from './apiClient';
-import type { AISummary } from '@/utils/types';
+import type { AISummary, Note } from '@/utils/types';
 
 export async function analyzeNote(
   content: string,
@@ -55,10 +55,13 @@ export async function streamChatResponse(
   message: string,
   callbacks: {
     history: Array<{ role: string; content: string; context_content?: string }>;
+    selectedNoteId?: number;
+    contextContent?: string;
     onChunk: (partial: string) => void;
     onStatus?: (status: string) => void;
     onContext?: (context: { id: number; title: string }[]) => void;
     onContextContent?: (content: string) => void;
+    onSelectionRequired?: (notes: Partial<Note>[]) => void;
     onError?: (err: Error) => void;
   }
 ): Promise<void> {
@@ -70,6 +73,19 @@ export async function streamChatResponse(
         if (data.startsWith('status:')) {
           if (callbacks.onStatus) {
             callbacks.onStatus(data.replace('status:', '').trim());
+          }
+        } else if (data.startsWith('selection_required:')) {
+          if (callbacks.onSelectionRequired) {
+            try {
+              const notes = JSON.parse(data.replace('selection_required:', '').trim());
+              callbacks.onSelectionRequired(notes);
+            } catch (e) {
+              console.error('Failed to parse selection_required', e);
+            }
+          }
+        } else if (data.startsWith('error:')) {
+          if (callbacks.onError) {
+            callbacks.onError(new Error(data.replace('error:', '').trim()));
           }
         } else if (data.startsWith('context:')) {
           if (callbacks.onContext) {
@@ -105,6 +121,8 @@ export async function streamChatResponse(
           content: m.content,
           context_content: m.context_content,
         })),
+        ...(callbacks.selectedNoteId ? { selected_note_id: callbacks.selectedNoteId } : {}),
+        ...(callbacks.contextContent ? { context_content: callbacks.contextContent } : {}),
       }),
     }
   );
